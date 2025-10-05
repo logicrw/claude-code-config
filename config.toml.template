@@ -1,0 +1,59 @@
+model = "gpt-5-codex"
+model_reasoning_effort = "high"
+
+[projects]
+[projects."/Users/chenrongwei/Projects/interview"]
+trust_level = "trusted"
+
+[projects."/Users/chenrongwei/Projects/options_flow_analysis"]
+trust_level = "trusted"
+
+[projects."/Users/chenrongwei/Projects/cursor-talk-to-figma-mcp"]
+trust_level = "trusted"
+
+[projects."/Users/chenrongwei/Projects/docx2json"]
+trust_level = "trusted"
+
+[projects."/Users/chenrongwei/Projects"]
+trust_level = "trusted"
+
+[mcp_servers]
+[mcp_servers.mcp-debugger]
+command = "node"
+args = [
+  "/Users/chenrongwei/mcp-debugger/dist/index.js",
+  "--log-level", "info",
+  "--log-file", "/Users/chenrongwei/mcp-debugger/debug-mcp-server.log"
+]
+
+[mcp_servers.exa]
+command = "npx"
+args = [ "-y", "@smithery/cli@latest", "run", "exa", "--key", "YOUR_EXA_API_KEY_HERE" ]
+
+[mcp_servers.serena]
+command = "uvx"
+args = [ "--from", "git+https://github.com/oraios/serena", "serena", "start-mcp-server", "--context", "ide-assistant" ]
+
+[mcp_servers.basic-memory]
+command = "uvx"
+args = [ "basic-memory", "mcp" ]
+
+[mcp_servers.ripgrep]
+command = "npx"
+args = [ "-y", "mcp-ripgrep" ]
+
+[mcp_servers.ctx]
+command = "/Users/chenrongwei/.local/bin/ctx"
+args = [ "server" ]
+
+[mcp_servers.tree-sitter]
+command = "uvx"
+args = [ "mcp-server-tree-sitter" ]
+
+[mcp_servers.semgrep]
+command = "uvx"
+args = [ "semgrep-mcp" ]
+
+[mcp_servers.repomapper]
+command = "uvx"
+args = [ "--from", "git+https://github.com/pdavis68/RepoMapper.git", "repomap-mcp" ]

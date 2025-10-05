@@ -1,0 +1,21 @@
+# 敏感信息
+*.log
+*.key
+*-key.txt
+.env
+.env.*
+
+# 排除包含 API key 的配置文件原件,使用模板替代
+mcp.json
+config.toml
+
+# 系统文件
+.DS_Store
+*.swp
+*.swo
+*~
+
+# 临时文件
+tmp/
+temp/
+*.tmp

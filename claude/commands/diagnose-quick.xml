@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Quick 模式示例：标准诊断，3-5K tokens -->
+<!-- 适用场景：常规问题诊断，包含项目上下文、安全扫描和基础分析 -->
+<!-- 坐标系：line/column 使用 1-based，byte_offset 使用 0-based -->
+<diagnosis mode="quick" timestamp="YYYY-MM-DDTHH:MM:SSZ" tokens="4000" schema_version="1.1">
+  <!-- 工具版本信息 -->
+  <tool_versions>
+    <tool name="mcp-debugger" version="0.15.4" note="运行时断点调试（推荐用于数据源不明、逻辑分支问题）"/>
+    <tool name="ripgrep" version="13.0.0" note="高性能文本搜索，尊重 gitignore"/>
+    <tool name="semgrep" version="1.45.0" note="安全漏洞扫描与代码质量检测（beta）"/>
+    <tool name="repomapper" version="0.2.1" note="PageRank 算法识别项目关键文件"/>
+    <tool name="git" version="2.39.0"/>
+  </tool_versions>
+
+  <problem>
+    <type>error</type>
+    <description>TypeError: Cannot read property 'id' of undefined</description>
+    <location file="src/user.service.ts" line="142" column="15" byte_offset="3845"/>
+    <frequency>Occurs on 30% of API calls</frequency>
+  </problem>
+
+  <code_investigation>
+    <!-- ripgrep: 错误模式搜索 -->
+    <error_patterns>
+      <pattern type="TypeError" count="5">
+        <occurrence file="src/user.service.ts" line="142" column="15"/>
+        <occurrence file="src/order.service.ts" line="89" column="22"/>
+        <occurrence file="src/product.service.ts" line="156" column="10"/>
+      </pattern>
+      <pattern type="undefined" count="12">
+        <occurrence file="src/user.service.ts" line="142" column="15"/>
+      </pattern>
+    </error_patterns>
+
+    <!-- semgrep: 安全和质量扫描 -->
+    <security_findings>
+      <finding rule="js.express.security.audit.missing-null-check" severity="medium" confidence="high">
+        <description>Missing null check after database operation</description>
+        <location file="src/user.service.ts" line="142" column="15" byte_offset="3845"/>
+        <fix>Check if user exists before accessing properties</fix>
+        <owasp>A03:2021 - Injection</owasp>
+        <cwe>CWE-476</cwe>
+      </finding>
+      <finding rule="js.express.best-practice.no-await-in-loop" severity="low">
+        <description>Await in loop can cause performance issues</description>
+        <location file="src/batch.service.ts" line="23" column="5"/>
+      </finding>
+    </security_findings>
+
+    <!-- Quick 模式跳过：serena 符号分析、tree-sitter AST 分析、exa 外部知识 -->
+  </code_investigation>
+
+  <!-- mcp-debugger: 运行时断点调试（推荐，适用于数据源不明、逻辑分支问题）-->
+  <runtime_debugging>
+    <session id="a4d1acc8-84a8" state="paused" reason="breakpoint">
+      <breakpoint id="28e06119-619e" file="src/user.service.ts" line="142" verified="true"/>
+      <stack_trace>
+        <frame id="3" name="getUser" file="src/user.service.ts" line="142" column="15"/>
+        <frame id="2" name="handler" file="src/api/routes.ts" line="45" column="20"/>
+        <frame id="1" name="express.middleware" file="node_modules/express/lib/router.js" line="635"/>
+      </stack_trace>
+      <scopes frame="3">
+        <scope name="Locals" variablesReference="5"/>
+        <scope name="Globals" variablesReference="6"/>
+      </scopes>
+      <variables scope="Locals" reference="5">
+        <variable name="userId" value="abc123" type="string"/>
+        <variable name="user" value="null" type="object" issue="Accessing property of null object"/>
+      </variables>
+    </session>
+  </runtime_debugging>
+
+  <!-- 备选：主动添加的 Debug 日志（当无法使用 mcp-debugger 时）-->
+  <!-- 原则：输出公式所有变量 + 使用结构化对象 -->
+  <!--
+  <debug_logs>
+    <log level="debug" timestamp="YYYY-MM-DDTHH:MM:SSZ" context="getUser:142">
+      <![CDATA[
+      [DEBUG] Operation: { userId: "abc123", user: null, expected: "object" }
+      [DEBUG] Validation: null check missing
+      ]]>
+    </log>
+    <finding>Structured logging reveals null value before property access</finding>
+  </debug_logs>
+  -->
+
+  <project_context>
+    <!-- repomapper: 项目结构和重要文件（PageRank 排序）-->
+    <structure>
+      <important_files>
+        <file path="src/user.service.ts" rank="10.8111" type="service"/>
+        <file path="src/db/connection.js" rank="8.2451" type="database"/>
+        <file path="src/api/routes.ts" rank="7.9234" type="api"/>
+        <file path="src/models/user.model.js" rank="6.5123" type="model"/>
+      </important_files>
+      <statistics>
+        <total_files>234</total_files>
+        <analyzed_files>15</analyzed_files>
+        <code_lines>12340</code_lines>
+        <test_coverage>45%</test_coverage>
+      </statistics>
+    </structure>
+
+    <dependencies>
+      <package name="mongoose" version="6.0.0" vulnerable="false"/>
+      <package name="express" version="4.18.0" vulnerable="false"/>
+      <package name="lodash" version="4.17.20" vulnerable="true" cve="CVE-2021-23337"/>
+    </dependencies>
+  </project_context>
+
+  <!-- git: 变更历史与工作区状态 -->
+  <git_context>
+    <working_tree>
+      <modified count="3" uncommitted="true">
+        <file path="src/user.service.ts" added="5" deleted="3"/>
+        <file path="src/api/routes.ts" added="2" deleted="1"/>
+        <file path="tests/user.test.js" added="10" deleted="0"/>
+      </modified>
+    </working_tree>
+    <recent_commits limit="5">
+      <commit hash="abc123" author="john@example.com" date="YYYY-MM-DD" message="Update user service"/>
+      <commit hash="def456" author="jane@example.com" date="YYYY-MM-DD" message="Fix database connection"/>
+    </recent_commits>
+    <branch_info>
+      <current>feature/user-update</current>
+      <ahead_main>3</ahead_main>
+      <behind_main>1</behind_main>
+    </branch_info>
+  </git_context>
+
+  <root_cause>
+    Database query returns null when user not found, but code assumes user always exists
+  </root_cause>
+
+  <fix_plan>
+    <step priority="1">Add null validation after database query</step>
+    <step priority="2">Implement proper error handling with 404 response</step>
+    <step priority="3">Add unit tests for null user scenario</step>
+    <step priority="4">Update API documentation</step>
+  </fix_plan>
+
+  <test_plan>
+    <test>Test getUser with non-existent userId</test>
+    <test>Test getUser with null database response</test>
+    <test>Verify 404 response for missing users</test>
+  </test_plan>
+
+  <lesson>
+    <problem>Cannot read property 'id' of undefined in user service</problem>
+    <root_cause>Database query returns null when user not found, but code assumes user always exists</root_cause>
+    <fix>Add null validation after database query + 404 response</fix>
+    <scope>Service layer database reads</scope>
+    <anti_patterns>Accessing properties before null-check</anti_patterns>
+  </lesson>
+</diagnosis>

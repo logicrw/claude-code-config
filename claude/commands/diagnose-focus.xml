@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Focus 模式示例：精简版诊断，1-2K tokens -->
+<!-- 适用场景：明确的错误快速修复 -->
+<!-- 坐标系：line/column 使用 1-based，byte_offset 使用 0-based -->
+<diagnosis mode="focus" timestamp="YYYY-MM-DDTHH:MM:SSZ" tokens="1500" schema_version="1.1">
+  <!-- 工具版本信息 -->
+  <tool_versions>
+    <tool name="mcp-debugger" version="0.15.4" note="运行时断点调试（可选，适用于复杂问题）"/>
+    <tool name="ripgrep" version="13.0.0" note="高性能文本搜索，尊重 gitignore"/>
+    <tool name="git" version="2.39.0"/>
+  </tool_versions>
+
+  <problem>
+    <type>error</type>
+    <description>TypeError: Cannot read property 'id' of undefined</description>
+    <location file="src/user.service.ts" line="142" column="15" byte_offset="3845"/>
+  </problem>
+
+  <!-- ripgrep: 错误位置代码片段 -->
+  <code_investigation>
+    <code_snippet file="src/user.service.ts" line="142">
+      <![CDATA[
+      140: async function getUser(userId) {
+      141:   const user = await db.findOne({ id: userId });
+      142:   return user.id; // TypeError here
+      143: }
+      ]]>
+    </code_snippet>
+    <error_stack>
+      <![CDATA[
+      TypeError: Cannot read property 'id' of undefined
+        at getUser (src/user.service.ts:142:15)
+        at handler (src/api/routes.ts:45:20)
+      ]]>
+    </error_stack>
+  </code_investigation>
+
+  <!-- mcp-debugger: 运行时断点调试（优先，可选）-->
+  <!-- 如无法启用 debugger，可使用下方 debug_logs 替代 -->
+  <runtime_debugging optional="true">
+    <session id="a4d1acc8-84a8" state="paused" reason="breakpoint">
+      <breakpoint id="28e06119-619e" file="src/user.service.ts" line="141" verified="true"/>
+      <variables scope="Locals">
+        <variable name="userId" value="abc123" type="string"/>
+        <variable name="user" value="null" type="object" issue="Null value will cause error on next line"/>
+      </variables>
+    </session>
+  </runtime_debugging>
+
+  <!-- 备选：主动添加的 Debug 日志（当无法使用 mcp-debugger 时）-->
+  <!-- 原则：输出公式所有变量 + 结构化对象 -->
+  <!--
+  <debug_logs>
+    <log level="debug" timestamp="YYYY-MM-DDTHH:MM:SSZ" context="getUser:141">
+      <![CDATA[
+      [DEBUG] { userId: "abc123", user: null, expected: "object" }
+      ]]>
+    </log>
+    <finding>Variable 'user' is null when expected to be object</finding>
+  </debug_logs>
+  -->
+
+  <!-- git: 工作区状态 -->
+  <git_context>
+    <working_tree>
+      <modified count="2">
+        <file path="src/user.service.ts" changes="+5 -3"/>
+        <file path="src/api/routes.ts" changes="+2 -1"/>
+      </modified>
+    </working_tree>
+  </git_context>
+
+  <root_cause>Missing null check after database query</root_cause>
+
+  <fix_plan>
+    <step priority="1">Add null check after findOne()</step>
+    <step priority="2">Return appropriate error response</step>
+  </fix_plan>
+
+  <lesson>
+    <problem>TypeError: Cannot read property 'id' of undefined</problem>
+    <root_cause>Missing null check after database query</root_cause>
+    <fix>Add null check after findOne() + error response</fix>
+    <scope>Database query results</scope>
+    <anti_patterns>Assuming query always returns data</anti_patterns>
+  </lesson>
+</diagnosis>
