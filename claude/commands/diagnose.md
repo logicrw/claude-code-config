@@ -103,18 +103,17 @@ git diff → 检查未提交变更
 
 ## 执行步骤
 
-**Steps:**
-1. Analyze problem type and auto-select mode (focus/quick/full)
-2. **Read the corresponding XML template file**:
+1. 分析问题类型并自动选择模式（focus/quick/full）
+2. **读取对应的 XML 模板文件**：
    - Focus: `~/.claude/commands/diagnose-focus.xml`
    - Quick: `~/.claude/commands/diagnose-quick.xml`
    - Full: `~/.claude/commands/diagnose-full.xml`
-3. Auto-capture recent execution logs from Claude Code history
-4. Execute targeted MCP analysis in parallel based on selected mode
-5. Process and deduplicate collected data
-6. Generate XML diagnosis report following the template structure
-7. Save to `diagnosis/<timestamp>-<issue-type>-<mode>.xml`
-8. Extract key findings from `<lesson>` node for memory storage (if critical)
+3. 自动捕获 Claude Code 历史中的最近执行日志
+4. 根据选定模式并行执行目标 MCP 分析
+5. 处理并去重收集的数据
+6. 遵循模板结构生成 XML 诊断报告
+7. 保存到 `diagnosis/<timestamp>-<issue-type>-<mode>.xml`
+8. 从 `<lesson>` 节点提取关键发现以供记忆存储（如果重要）
 
 ---
 
