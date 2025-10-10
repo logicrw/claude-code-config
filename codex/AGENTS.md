@@ -64,7 +64,7 @@
 
 **允许**：
 - 在 `designs/<ID>.design.md` 中撰写 **Solution / Tests / Risks & Mitigations / Rollout & Rollback**
-- 如需，向 `tasks/<ParentID>.task.md` 追加子任务（英文表头 + 中文描述）
+- 如需，向 `tasks/<ParentID>.task.md` 追加子任务
 
 **工具策略**：
 - **serena**：LSP 语义分析待修改符号的引用者，评估影响范围（支持多语言）
@@ -75,8 +75,8 @@
 - **exa (web_search_exa)**：查询通用解决方案与设计模式
 
 **必须产出**：
-- **Objectives**、**Assumptions & Constraints**、**Options & Trade-offs**（英文条目 + 中文权衡说明）
-- **Acceptance Criteria**（可测可验，英文条目）与 **Test Plan**（英文条目）
+- **目标**、**假设与约束**、**方案选项与权衡**
+- **验收标准**（可测可验）与**测试计划**
 
 **禁止**：
 - 修改业务代码
@@ -108,11 +108,11 @@
 - 更新文档（`designs/*.design.md` 的 Tests 结果、`tasks/*.task.md` 勾选完成）
 
 **硬性要求**：
-- 先贴 **diff/patch**（英文代码块），确认后再应用或提交
+- 先贴 **diff/patch**，确认后再应用或提交
 - **提交信息使用中文** + 范围标签（如 `feat:`/`fix:`/`docs:`）
 - **测试驱动流程**：修改完成后必须运行测试 → 通过则提交 commit → 失败则切换到 DIAGNOSE 模式，主动添加 debug 日志后重新诊断，生成诊断报告
 - **修复完成流程**：重要修复/发现记录到 Serena（如需），阶段性完成更新 Basic Memory（如需），再进行 Git 提交
-- 发现设计/需求问题：停止改动，给出 **Diagnosis**（中文）与 **Next Steps**（英文），建议切回相应模式
+- 发现设计/需求问题：停止改动，给出**诊断结论**与**后续步骤**，建议切回相应模式
 - 重要进展完成后执行**版本管理提醒**（见文末）
 
 **禁止**：
@@ -214,24 +214,24 @@
 ---
 
 ## 7) 质量门槛（Quality Gates）
-**Pre-flight Checklist**（英文条目）
-- Scope minimized
-- Secrets redacted
-- Dry-run available (if applicable)
-- Tests defined & pass locally
-- Rollback plan ready (if stateful)
+**执行前检查清单**：
+- 范围已最小化
+- 敏感信息已脱敏
+- 可用性测试（如适用）
+- 测试已定义并本地通过
+- 回滚方案已就绪（如有状态变更）
 
-**Post-change Checklist**（英文条目）
-- All tests green
-- Docs updated
-- Observability verified (logs/metrics)
-- Risk items revisited
-- User sign-off received
+**执行后检查清单**：
+- 所有测试通过
+- 文档已更新
+- 可观测性验证（日志/指标）
+- 风险项已复核
+- 用户已确认
 
 ---
 
 ## 8) 安全与边界（Safety Boundaries）
-- 任何具有副作用的建议（安装依赖、修改配置、批量重命名/删除、数据迁移等）需先给出 **Steps**（英文）与影响说明（中文），经确认后再执行。
+- 任何具有副作用的建议（安装依赖、修改配置、批量重命名/删除、数据迁移等）需先给出**执行步骤**与影响说明，经确认后再执行。
 - 谨慎对待破坏性命令与大规模重构；强调回滚与备份路径。
 - 对敏感信息进行脱敏处理；不得输出 `.env`、密钥、Token、Cookie 等内容。
 
