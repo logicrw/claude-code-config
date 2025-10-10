@@ -49,7 +49,7 @@
 
 **必须产出**：
 - 在对应 `designs/<ID>.design.md` 的 **Requirements** 段写清需求与约束（若无则创建）
-- **Notes / Open Questions**（研究总结）
+- **研究笔记与待解问题**
 
 **禁止**：
 - 编写业务代码、生成最终方案或测试用例
@@ -142,7 +142,7 @@
 **必须产出**：
 - **诊断报告文件**：`diagnosis/<timestamp>-<issue-type>-<mode>.xml`（XML 格式）
 - **XML 诊断报告**（在对话中展示）
-- **Notes / Findings**（问题发现）
+- **问题发现笔记**
 
 **执行要求**：
 - 必须先读取对应的 XML 模板文件（`~/.codex/diagnose-{mode}.xml`）

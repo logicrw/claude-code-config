@@ -140,33 +140,33 @@ grep -A 3 "\[mcp_servers\]" ~/.codex/config.toml
 
 完成重大功能后的提交流程:
 
-**Steps**:
-1. Push branch
-2. Open/update PR
-3. Ensure CI green & complete review
-4. Merge with protection rules
-5. Sync default branch
-6. Update docs & `CHANGELOG.md`
-7. Determine SemVer bump & create annotated tag
-8. Generate/publish release notes
-9. Post-release verification & rollback readiness
-10. Clean up merged branches
+**执行步骤**:
+1. 推送分支到远程
+2. 创建/更新 PR
+3. 确保 CI 通过并完成代码审查
+4. 使用保护规则合并
+5. 同步默认分支
+6. 更新文档与 `CHANGELOG.md`
+7. 确定 SemVer 版本号并创建标注标签
+8. 生成/发布版本说明
+9. 发布后验证与回滚准备
+10. 清理已合并分支
 
 ## 质量门槛
 
-**Pre-flight Checklist**:
-- Scope minimized
-- Secrets redacted
-- Dry-run available (if applicable)
-- Tests defined & pass locally
-- Rollback plan ready (if stateful)
+**执行前检查清单**:
+- 范围已最小化
+- 敏感信息已脱敏
+- 可用性测试（如适用）
+- 测试已定义并本地通过
+- 回滚方案已就绪（如有状态变更）
 
-**Post-change Checklist**:
-- All tests green
-- Docs updated
-- Observability verified (logs/metrics)
-- Risk items revisited
-- User sign-off received
+**执行后检查清单**:
+- 所有测试通过
+- 文档已更新
+- 可观测性验证（日志/指标）
+- 风险项已复核
+- 用户已确认
 
 ## 安全边界
 
@@ -174,13 +174,6 @@ grep -A 3 "\[mcp_servers\]" ~/.codex/config.toml
 - 破坏性命令必须有回滚方案
 - 敏感信息脱敏处理
 - 禁止输出 `.env`、密钥、Token
-
-## 维护记录
-
-- **2025-01-05**: 初始化仓库,集成 mcp-debugger
-- **版本**: v1.0.0
-- **Claude Code**: 兼容最新版本
-- **Codex**: 兼容最新版本
 
 ## 许可证
 
