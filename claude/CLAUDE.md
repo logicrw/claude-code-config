@@ -61,7 +61,7 @@
 
 **必须产出**：
 - 在对应 `designs/<ID>.design.md` 的 **Requirements** 段写清需求与约束（若无则创建）
-- **Notes / Open Questions**（英文 bullet 列表）
+- **Notes / Open Questions**（研究总结）
 
 **禁止**：
 - 编写业务代码、生成最终方案或测试用例
@@ -155,7 +155,7 @@
 **必须产出**：
 - **诊断报告文件**：`diagnosis/<timestamp>-<issue-type>-<mode>.xml`（XML 格式）
 - **XML 诊断报告**（在对话中展示）
-- **Notes / Findings**（问题发现，英文 bullet 列表）
+- **Notes / Findings**（问题发现）
 
 **执行要求**：
 - 必须先读取对应的 XML 模板文件（`.claude/commands/diagnose-{mode}.xml`）
@@ -269,6 +269,43 @@
 ## 协作补充（Co-working Tips）
 - 若遇到需要浏览器或外部系统操作的环节（例如页面点击、控制台设置），可直接请求用户协助完成。
 - 遇到长链路或外部依赖阻塞时，优先产出"最小可行方案（MVP）"与后续增量路线。
+
+---
+
+## 技术栈参考（Tech Stack References）
+
+当涉及特定技术栈时，参考外部指南（按需读取，避免 Token 浪费）：
+
+### Python 环境管理
+**文档**: `/Users/chenrongwei/Projects/PYTHON_ENV_QUICK_GUIDE.md`
+
+**触发场景**：
+- 用户要安装 Python CLI 工具（如 langgraph-cli、ruff、black）
+- 用户要创建/处理 Python 项目
+- 涉及 pyenv、uv tool、venv 等环境管理
+
+**核心原则**（3 秒速查）：
+```bash
+# CLI 工具安装
+uv tool install <tool>                    # ✅ 正确
+pip install <tool>                        # ❌ 错误（污染全局环境）
+
+# 新项目流程
+pyenv local 3.13.0                        # 设置版本（可选）
+python3 -m venv .venv                     # 创建虚拟环境
+source .venv/bin/activate                 # 激活
+pip install <packages>                    # 安装项目依赖
+
+# 关键禁止项
+❌ pip install 全局安装 CLI 工具
+❌ 不创建 venv 直接 pip install
+❌ 提交 .venv/ 目录到 git
+```
+
+**查阅策略**：
+- 快速决策：只需看上述核心原则（3 秒）
+- 完整流程：读取完整文档的"快速决策表"和对应场景（15 秒）
+- 问题排查：读取"常见错误与修正"章节
 
 ---
 
