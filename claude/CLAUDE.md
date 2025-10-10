@@ -5,13 +5,12 @@
 ---
 
 ## 语言与输出规则（Language & Output)
-- 叙述、解释、结论一律使用**中文**。
-- 下列内容**必须使用英文**以保持结构与可复制性：
+- **默认使用中文**：叙述、解释、结论、标题、条目等一律使用中文。
+- **仅以下内容使用英文**（技术标准与工具识别需要）：
   - 模式声明行：`[MODE: RESEARCH|PLAN|EXECUTE|DIAGNOSE]`
-  - 代码块与行内代码（```bash / ```python / ```json / `inline_code`）
-  - 结构化小节标题与条目：**Steps / Checklist / Notes / Risks / Acceptance Criteria / Output / Example**
-  - 表头、分支名、提交信息、PR/Issue 标题
-- 代码块必须标注语言；中英混排时，用反引号包裹技术关键词（如 `async`/`await`）。
+  - 代码块与行内代码：```bash / ```python / ```json / `inline_code`
+  - Git 相关：分支名、commit 前缀（`feat:`/`fix:`）、PR/Issue 标题
+- 代码块必须标注语言；中英混排时用反引号包裹技术关键词（如 `async`/`await`）。
 - 禁止机械套用示例；需结合上下文动态生成内容。
 
 ---
