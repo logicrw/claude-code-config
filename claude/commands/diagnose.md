@@ -3,9 +3,18 @@
 ## 职责边界
 - ✅ **允许**：诊断问题根因、定位错误、分析性能瓶颈、生成 XML 格式诊断报告
 - ✅ **必须**：
-  - 先读取对应的 XML 模板文件（`diagnose-{mode}.xml`）
+  - 先读取对应的 XML 模板文件（`./diagnose-{mode}.xml`，相对于 commands/ 目录）
   - 基于模板结构生成报告，确保格式一致性
   - 生成后从 `<lesson>` 节点提取要点，重要发现可记录到 Serena
+- ✅ **必须产出**：
+  - **XML 诊断报告**（在对话中展示，临时生成）
+  - **问题发现笔记**
+
+- 📁 **可选产出**（重要问题时）：
+  - **诊断报告文件**
+    路径：`~/basic-memory/<project>/diagnosis/<timestamp>-<issue-type>-<mode>.xml`
+    触发条件：值得复盘的问题、花费超过 30 分钟、涉及架构缺陷
+  - **Serena 记忆**（pitfalls_<module>，如有技术陷阱）
 - ❌ **禁止**：直接修改代码（应提供 fix_plan 后切换到 EXECUTE）、改变需求或架构
 - 🔄 **切换**：问题已定位 → EXECUTE 实施修复；发现需求问题 → RESEARCH；需要架构调整 → PLAN
 - 💡 **提醒**：根据问题复杂度选择分析深度（focus/quick/full），避免过度收集数据
@@ -15,7 +24,7 @@
 ## 工作流程
 
 ```
-问题报告 → 选择模式 → 读取 XML 模板 → **主动添加 Debug 日志** → 并行调用 MCP 工具 → 收集分析数据 → 基于模板生成报告 → 保存到 diagnosis/
+问题报告 → 选择模式 → 读取 XML 模板 → **主动添加 Debug 日志** → 并行调用 MCP 工具 → 收集分析数据 → 基于模板生成报告 → 在对话中展示 → 可选保存到 Basic Memory（重要问题）
 ```
 
 **关键原则**：当遇到计算错误、数值异常、逻辑问题时，**必须主动添加结构化 Debug 日志**，而不是等待用户请求。
@@ -24,77 +33,62 @@
 
 ## 诊断模式选择
 
-### Focus 模式（1-2K tokens）
-- **Token 范围**：1,000-2,000
-- **适用场景**：明确错误、快速诊断
-- **数据收集**：
-  - 自动捕获的错误日志
-  - 错误位置代码（ripgrep: 错误文件 ±20行）
-  - 最近的 git diff（未提交变更）
-  - 可选：mcp-debugger（仅当需要快速检查变量值时）
-  - 跳过：项目结构、深度分析
-- **模板文件**：`~/.claude/commands/diagnose-focus.xml`
+### 模式对比速查表
 
-### Quick 模式（3-5K tokens，默认）
-- **Token 范围**：3,000-5,000
-- **适用场景**：初步诊断、简单问题
-- **数据收集**：
-  - Focus 的所有内容
-  - mcp-debugger（推荐，用于数据源不明、逻辑分支问题）
-  - 项目结构概览（repomapper: PageRank 识别关键文件）
-  - 错误模式搜索（ripgrep: ERROR|FAIL|Exception）
-  - 安全扫描（semgrep: p/ci 规则集）
-  - Git 变更（最近5个提交）
-  - 跳过：AST分析、外部知识
-- **模板文件**：`~/.claude/commands/diagnose-quick.xml`
+| 模式 | Token 范围 | 适用场景 | 核心工具 | 数据收集范围 | 模板文件 |
+|------|-----------|---------|---------|------------|---------|
+| **Focus** | 1K-2K | 明确错误、快速诊断 | ripgrep + git diff | 错误日志 + 错误代码 ±20 行 + 未提交变更 | `./diagnose-focus.xml` |
+| **Quick** | 3K-5K | 初步诊断、简单问题（默认） | + mcp-debugger + repomapper + semgrep | + 项目结构 + 错误模式搜索 + 安全扫描 + 最近 5 次提交 | `./diagnose-quick.xml` |
+| **Full** | 8K-12K | 复杂问题、深度分析、性能问题 | + serena + tree-sitter + exa | + 符号分析 + AST 分析 + 外部知识 + 历史分析 + 依赖分析 | `./diagnose-full.xml` |
 
-### Full 模式（8-12K tokens）
-- **Token 范围**：8,000-12,000
-- **适用场景**：复杂问题、深度分析、性能问题
-- **数据收集**：
-  - Quick 的所有内容
-  - mcp-debugger（优先使用，完整 stack trace + 多层 scopes + 单步执行）
-  - 符号分析（serena: LSP 语义分析，相关函数/类的完整定义）
-  - AST 分析（tree-sitter: 精确语法解析与代码结构问题）
-  - 外部知识（exa get_code_context_exa: 10 亿+ 代码库搜索相关库文档、Stack Overflow）
-  - 历史分析（git log: 相关文件的变更历史）
-  - 依赖分析（package.json、requirements.txt 等）
-- **模板文件**：`~/.claude/commands/diagnose-full.xml`
+### 详细说明
+
+#### Focus 模式（快速诊断）
+- **跳过**：项目结构、深度分析
+- **可选工具**：mcp-debugger（仅当需要快速检查变量值时）
+
+#### Quick 模式（推荐默认）
+- **推荐工具**：mcp-debugger（用于数据源不明、逻辑分支问题）
+- **跳过**：AST 分析、外部知识
+
+#### Full 模式（全面分析）
+- **优先工具**：mcp-debugger（完整 stack trace + 多层 scopes + 单步执行）
+- **适合场景**：性能瓶颈、架构问题、复杂 bug
 
 ---
 
 ## 工具策略（并行调用）
 
 ### 运行时调试（优先）
-```
+```bash
 mcp-debugger → 断点调试、单步执行、变量检查（适用于复杂问题、数据源不明）
 ```
 
 ### 核心诊断工具
-```
+```bash
 ripgrep → 高性能定位错误位置（尊重 gitignore）
 serena find_symbol → 理解相关符号实现（LSP 语义分析，多语言支持）
 tree-sitter → 精确语法分析与复杂度检查（增量解析）
 ```
 
 ### 安全与质量
-```
+```bash
 semgrep → 安全漏洞扫描与代码质量检测（beta，p/ci 规则集）
 ```
 
 ### 项目结构
-```
+```bash
 repomapper → 识别关键文件与高耦合模块（PageRank 算法）
 ```
 
 ### 外部知识（Full 模式）
-```
+```bash
 exa (get_code_context_exa) → 搜索相关库文档与 Stack Overflow（10 亿+ 代码库）
 exa (web_search_exa) → 查询问题解决方案与最佳实践
 ```
 
 ### 历史分析
-```
+```bash
 git log → 追踪相关文件的变更历史
 git diff → 检查未提交变更
 ```
@@ -104,16 +98,18 @@ git diff → 检查未提交变更
 ## 执行步骤
 
 1. 分析问题类型并自动选择模式（focus/quick/full）
-2. **读取对应的 XML 模板文件**：
-   - Focus: `~/.claude/commands/diagnose-focus.xml`
-   - Quick: `~/.claude/commands/diagnose-quick.xml`
-   - Full: `~/.claude/commands/diagnose-full.xml`
+2. **读取对应的 XML 模板文件**（相对于 commands/ 目录）：
+   - Focus: `./diagnose-focus.xml`
+   - Quick: `./diagnose-quick.xml`
+   - Full: `./diagnose-full.xml`
 3. 自动捕获 Claude Code 历史中的最近执行日志
 4. 根据选定模式并行执行目标 MCP 分析
 5. 处理并去重收集的数据
-6. 遵循模板结构生成 XML 诊断报告
-7. 保存到 `diagnosis/<timestamp>-<issue-type>-<mode>.xml`
-8. 从 `<lesson>` 节点提取关键发现以供记忆存储（如果重要）
+6. 遵循模板结构生成 XML 诊断报告（会话内展示）
+7. 从 `<lesson>` 节点提取关键发现
+8. 记忆更新（如需）：
+   - 重要问题 → `~/basic-memory/<project>/diagnosis/<timestamp>-<issue-type>-<mode>.xml`
+   - 技术陷阱 → Serena (`pitfalls_<module>`)
 
 ---
 
@@ -169,29 +165,3 @@ console.log('[DEBUG] Data sources:', {
 - 包含上下文（ID、名称、类型）
 - 显示公式（而非只有数值）
 
----
-
-## 常见 DIAGNOSE 任务
-
-**快速错误定位（Focus）**：
-1. 自动捕获错误日志与堆栈
-2. `ripgrep` → 定位错误代码位置
-3. `git diff` → 检查最近变更
-4. 生成 Focus 模式诊断报告
-
-**安全漏洞分析（Quick）**：
-1. `semgrep` (p/ci) → 扫描安全问题
-2. `ripgrep` → 搜索相似漏洞模式
-3. `repomapper` → 识别影响范围
-4. 生成 Quick 模式诊断报告
-
-**性能瓶颈诊断（Full）**：
-1. `tree-sitter` → 识别高复杂度函数
-2. `serena find_symbol` → 分析热点函数实现
-3. `repomapper` → 识别高耦合依赖
-4. `exa (get_code_context_exa)` → 搜索性能优化方案
-5. 生成 Full 模式诊断报告
-
----
-
-诊断完成后，根据 fix_plan 切换到 EXECUTE 实施修复。
