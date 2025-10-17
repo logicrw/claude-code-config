@@ -30,13 +30,15 @@ claude-code-config/
 │       └── diagnose-full.xml  # Full 诊断模板 (8-12K tokens)
 ├── codex/
 │   └── AGENTS.md              # Codex 单文件协议（481 行）
+├── mcp.json.template          # Claude Code MCP 配置模板
+├── config.toml.template       # Serena/Codex MCP 配置模板
 └── README.md                  # 本文档
 ```
 
-**注意**：
-- ⚠️ **不再提供** `mcp.json.template` 和 `config.toml.template`
-- ✅ 请直接在 `~/.claude/` 和 `~/.codex/` 目录中配置 MCP 工具
-- ✅ 本仓库专注于 **RPE 协作协议文档**，不包含环境配置
+**配置文件说明**：
+- ✅ 提供 `mcp.json.template` 和 `config.toml.template` 作为参考
+- ✅ 模板中已移除个人隐私信息（路径、API Key 等）
+- ✅ 请根据实际环境修改模板后复制到 `~/.claude/` 或 `~/.codex/`
 
 ---
 
@@ -87,17 +89,30 @@ cp claude/commands/diagnose-*.xml ~/.codex/
 
 ### MCP 工具配置
 
-**重要**：本仓库不包含 MCP 配置文件，请按照以下步骤配置：
+本仓库提供 MCP 配置模板文件，按照以下步骤配置：
 
-1. **创建 `~/.claude/mcp.json`**（参考 Claude Code 官方文档）
-2. **配置所需的 MCP 工具**：
+1. **复制并修改 MCP 配置模板**：
+   ```bash
+   # Claude Code 配置
+   cp mcp.json.template ~/.claude/mcp.json
+
+   # Serena/Codex 配置
+   cp config.toml.template ~/.codex/config.toml
+   ```
+
+2. **修改配置文件中的占位符**：
+   - `YOUR_EXA_API_KEY_HERE` → 替换为实际的 Exa API Key
+   - `/path/to/mcp-debugger/...` → 替换为实际的 mcp-debugger 安装路径
+   - 其他本地路径根据实际情况调整
+
+3. **配置的 MCP 工具**（9 个）：
    - `mcp-debugger`（运行时调试，高优先级）
    - `serena`（LSP 符号分析）
    - `ripgrep`（文本搜索）
    - `basic-memory`（知识图谱）
    - `tree-sitter`、`semgrep`、`repomapper`、`exa`、`ctx`
 
-3. **验证 MCP 工具**：
+4. **验证 MCP 工具**：
    ```bash
    # 启动 Claude Code 后输入：
    /mcp
@@ -472,9 +487,9 @@ cp claude/commands/diagnose-*.xml ~/.claude/commands/
 
 ---
 
-**最后更新**: 2025-10-12
+**最后更新**: 2025-10-17
+- ✅ 恢复 MCP 配置模板文件（移除隐私信息）
 - ✅ 精简命令文档，减少 47% Token 使用
 - ✅ 统一路径引用与记忆体系
 - ✅ 优化 settings.json（4 个 Hook）
-- ✅ 移除配置模板（专注协议文档）
 - ✅ 补充故障排查指南
