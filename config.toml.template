@@ -17,8 +17,8 @@ command = "uvx"
 args = [ "mcp-server-tree-sitter" ]
 
 [mcp_servers.semgrep]
-command = "uvx"
-args = [ "semgrep-mcp" ]
+command = "semgrep"
+args = [ "mcp" ]
 
 [mcp_servers.repomapper]
 command = "uvx"

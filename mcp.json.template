@@ -31,9 +31,9 @@
       ]
     },
     "semgrep": {
-      "command": "uvx",
+      "command": "semgrep",
       "args": [
-        "semgrep-mcp"
+        "mcp"
       ]
     },
     "repomapper": {
