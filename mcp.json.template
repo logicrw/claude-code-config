@@ -11,13 +11,6 @@
         "ide-assistant"
       ]
     },
-    "basic-memory": {
-      "command": "uvx",
-      "args": [
-        "basic-memory",
-        "mcp"
-      ]
-    },
     "ripgrep": {
       "command": "npx",
       "args": [

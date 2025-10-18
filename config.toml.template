@@ -4,10 +4,6 @@
 command = "uvx"
 args = [ "--from", "git+https://github.com/oraios/serena", "serena", "start-mcp-server", "--context", "ide-assistant" ]
 
-[mcp_servers.basic-memory]
-command = "uvx"
-args = [ "basic-memory", "mcp" ]
-
 [mcp_servers.ripgrep]
 command = "npx"
 args = [ "-y", "mcp-ripgrep" ]

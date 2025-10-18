@@ -1,40 +1,83 @@
-# 现在进入 **PLAN 模式**
+---
+description: 进入 PLAN 模式
+---
 
-## 职责边界
-- ✅ **允许**：制定方案、接口契约、任务拆分与测试计划
-- ✅ **必须**：
-  - 在设计文档记录目标、约束和取舍；遵循 TDD 原则（测试先行）
-  - 重要决策需创建决策记录（简化 ADR）到 `~/basic-memory/<project>/decisions/`
-- ✅ **产物**：
-  - 设计方案 → `~/basic-memory/<project>/designs/`
-  - 决策记录 → `~/basic-memory/<project>/decisions/`（重要技术选型时）
-  - 任务追踪 → Claude Code Todos（会话内）
-- ❌ **禁止**：直接修改业务代码
-- 🔄 **切换**：方案确认后进入 EXECUTE；若需求变化则回到 RESEARCH
-- 💡 **提醒**：参考现有代码，保持设计简洁，避免过度设计
+## 🎨 核心职责
+
+**形成可执行的技术方案**，包含测试计划、风险评估与任务拆分。
+
+**产出**：设计文档（`docs/architecture/`）+ 决策记录（`docs/decisions/`，重要选型）
 
 ---
 
-## 工具策略（影响评估优先）
+## ✅ 执行清单
 
-### 评估修改影响范围
+### 1. 评估修改影响
 ```bash
-serena find_symbol → 理解当前实现（LSP 语义分析，多语言支持）
-serena find_referencing_symbols → 找到所有调用者（符号级引用）
-repomapper → 识别高耦合文件（PageRank 算法）
+# 找到所有关联代码
+serena find_symbol <target>
+serena find_referencing_symbols <target>
+repomapper  # 识别高耦合文件
 ```
 
-### 识别技术风险
+### 2. 识别技术风险
 ```bash
-tree-sitter → 精确语法解析，分析代码复杂度（增量分析）
-semgrep → 安全漏洞检测，预检测代码质量问题
-Serena → 查询相关约束与陷阱（项目级记忆）
+# 扫描潜在问题
+tree-sitter analyze <file>  # 复杂度分析
+semgrep scan                 # 安全检测
+serena read_memory "constraints_<topic>"
+serena read_memory "pitfalls_<module>"
 ```
 
-### 参考外部方案
+### 3. 参考外部方案
 ```bash
-exa (get_code_context_exa) → 搜索业界代码示例与实现（10 亿+ 代码库）
-exa (web_search_exa) → 查询设计模式与架构方案
-ripgrep → 高性能搜索项目内类似实现（尊重 gitignore）
+# 搜索业界实践
+exa get_code_context "类似实现"
+exa web_search "设计模式"
+ripgrep "项目内类似代码"
+
+# 查询通用技术选型
+serena read_memory "strategy_<comparison>"
+serena read_memory "selection_<category>"
 ```
 
+### 4. 撰写设计文档
+**必含内容**（遵循 TDD 原则）：
+- 目标与假设
+- 方案选项对比（≥2 个备选）
+- 验收标准（可测试）
+- 测试计划（单元/集成/边界）
+
+**保存路径**：`docs/architecture/YYYY-MM-DD-<topic>.md`
+
+### 5. 决策记录协议（AI 自动触发）
+**触发条件**：重要技术选型、架构调整
+
+**AI 自动询问记录方式**：
+1. 创建正式 ADR (`docs/decisions/YYYY-MM-DD-<topic>.md`)
+2. 记录到 Serena (`strategy_<topic>` / `selection_<category>`) ← 如果是通用对比
+3. 仅保留在 commit message ← 如果是简单选择
+
+**默认选项**：1（创建 ADR）
+
+---
+
+## 🔄 模式切换
+
+- ✅ 用户确认方案 → **EXECUTE**
+- ⚠️ 需求变化 → **RESEARCH**
+
+---
+
+<details>
+<summary>🛠️ 工具速查（点击展开）</summary>
+
+| 工具 | 用途 | 关键能力 |
+|------|------|---------|
+| **serena** | 符号级影响分析 | 找调用者、查约束 |
+| **repomapper** | 识别高耦合模块 | PageRank 算法 |
+| **tree-sitter** | 语法与复杂度 | AST 分析 |
+| **semgrep** | 安全风险扫描 | 代码质量检测 |
+| **exa** | 外部方案搜索 | 10 亿+ 代码库 |
+
+</details>

@@ -1,33 +1,81 @@
-# 现在进入 **DIAGNOSE 模式**
+---
+description: 进入 DIAGNOSE 模式
+---
 
-## 职责边界
-- ✅ **允许**：诊断问题根因、定位错误、分析性能瓶颈、生成 XML 格式诊断报告
-- ✅ **必须**：
-  - 先读取对应的 XML 模板文件（`./diagnose-{mode}.xml`，相对于 commands/ 目录）
-  - 基于模板结构生成报告，确保格式一致性
-  - 生成后从 `<lesson>` 节点提取要点，重要发现可记录到 Serena
-- ✅ **必须产出**：
-  - **XML 诊断报告**（在对话中展示，临时生成）
-  - **问题发现笔记**
+## 🔬 核心职责
 
-- 📁 **可选产出**（重要问题时）：
-  - **诊断报告文件**
-    路径：`~/basic-memory/<project>/diagnosis/<timestamp>-<issue-type>-<mode>.xml`
-    触发条件：值得复盘的问题、花费超过 30 分钟、涉及架构缺陷
-  - **Serena 记忆**（pitfalls_<module>，如有技术陷阱）
-- ❌ **禁止**：直接修改代码（应提供 fix_plan 后切换到 EXECUTE）、改变需求或架构
-- 🔄 **切换**：问题已定位 → EXECUTE 实施修复；发现需求问题 → RESEARCH；需要架构调整 → PLAN
-- 💡 **提醒**：根据问题复杂度选择分析深度（focus/quick/full），避免过度收集数据
+**诊断问题根因**，定位错误、分析性能瓶颈，生成 XML 诊断报告。
+
+**产出**：根因分析报告 + 陷阱记录（重要问题记录到 Serena 或 `docs/troubleshooting/`）
 
 ---
 
-## 工作流程
+## ✅ 执行清单
 
-```
-问题报告 → 选择模式 → 读取 XML 模板 → **主动添加 Debug 日志** → 并行调用 MCP 工具 → 收集分析数据 → 基于模板生成报告 → 在对话中展示 → 可选保存到 Basic Memory（重要问题）
+### 1. 选择诊断深度
+| 模式 | Token | 适用场景 |
+|------|-------|---------|
+| **focus** | 1K-2K | 明确错误、快速定位 |
+| **quick** | 3K-5K | 初步诊断（默认） |
+| **full** | 8K-12K | 复杂问题、深度分析 |
+
+### 2. 运行时调试（优先）
+```bash
+# 适用于：数据源不明、逻辑分支、复杂计算
+mcp-debugger set_breakpoint <file> <line>
+mcp-debugger step_over
+mcp-debugger inspect_variable <name>
 ```
 
-**关键原则**：当遇到计算错误、数值异常、逻辑问题时，**必须主动添加结构化 Debug 日志**，而不是等待用户请求。
+### 3. 定位问题代码
+```bash
+# 搜索错误位置
+ripgrep "error_pattern"
+serena find_symbol <error_source>
+tree-sitter analyze <file>  # 语法问题
+```
+
+### 4. 分析影响范围
+```bash
+# 评估关联模块
+repomapper                           # 高耦合文件
+serena find_referencing_symbols      # 调用关系
+semgrep scan                         # 安全漏洞
+```
+
+### 5. 追踪历史变更
+```bash
+git log --follow <file>
+git diff HEAD~5 <file>
+```
+
+### 6. 生成诊断报告
+- 读取模板：`~/.claude/commands/diagnose-{mode}.xml`
+- 生成 XML 报告（在对话中展示）
+
+### 7. 记录技术陷阱（重要问题）
+```bash
+# 立即记录到 Serena（通用陷阱）
+serena write_memory "pitfalls_jwt_concurrent_refresh" """
+问题：并发刷新 refresh token 导致竞态条件
+原因：旧 token 立即失效，并发请求失败
+解决：sliding window + 5 秒宽限期
+测试：ab -n 100 -c 10 /api/refresh
+"""
+
+# 或保存到 Git（项目特定的重大问题）
+# 路径：docs/troubleshooting/YYYY-MM-DD-<issue>.md
+```
+
+---
+
+## 🔄 模式切换
+
+- ✅ 问题已定位 → **EXECUTE** 修复
+- ⚠️ 发现需求问题 → **RESEARCH**
+- 🏗️ 需要架构调整 → **PLAN**
+
+---
 
 ---
 
@@ -35,25 +83,11 @@
 
 ### 模式对比速查表
 
-| 模式 | Token 范围 | 适用场景 | 核心工具 | 数据收集范围 | 模板文件 |
-|------|-----------|---------|---------|------------|---------|
-| **Focus** | 1K-2K | 明确错误、快速诊断 | ripgrep + git diff | 错误日志 + 错误代码 ±20 行 + 未提交变更 | `./diagnose-focus.xml` |
-| **Quick** | 3K-5K | 初步诊断、简单问题（默认） | + mcp-debugger + repomapper + semgrep | + 项目结构 + 错误模式搜索 + 安全扫描 + 最近 5 次提交 | `./diagnose-quick.xml` |
-| **Full** | 8K-12K | 复杂问题、深度分析、性能问题 | + serena + tree-sitter + exa | + 符号分析 + AST 分析 + 外部知识 + 历史分析 + 依赖分析 | `./diagnose-full.xml` |
-
-### 详细说明
-
-#### Focus 模式（快速诊断）
-- **跳过**：项目结构、深度分析
-- **可选工具**：mcp-debugger（仅当需要快速检查变量值时）
-
-#### Quick 模式（推荐默认）
-- **推荐工具**：mcp-debugger（用于数据源不明、逻辑分支问题）
-- **跳过**：AST 分析、外部知识
-
-#### Full 模式（全面分析）
-- **优先工具**：mcp-debugger（完整 stack trace + 多层 scopes + 单步执行）
-- **适合场景**：性能瓶颈、架构问题、复杂 bug
+| 模式 | Token 范围 | 适用场景 | 核心工具 | 数据收集范围 |
+|------|-----------|---------|---------|------------|
+| **Focus** | 1K-2K | 明确错误、快速诊断 | ripgrep + git diff | 错误日志 + 错误代码 ±20 行 + 未提交变更 |
+| **Quick** | 3K-5K | 初步诊断、简单问题（默认） | + mcp-debugger + repomapper + semgrep | + 项目结构 + 错误模式搜索 + 安全扫描 + 最近 5 次提交 |
+| **Full** | 8K-12K | 复杂问题、深度分析、性能问题 | + serena + tree-sitter + exa | + 符号分析 + AST 分析 + 外部知识 + 历史分析 + 依赖分析 |
 
 ---
 
@@ -95,37 +129,6 @@ git diff → 检查未提交变更
 
 ---
 
-## 执行步骤
-
-1. 分析问题类型并自动选择模式（focus/quick/full）
-2. **读取对应的 XML 模板文件**（相对于 commands/ 目录）：
-   - Focus: `./diagnose-focus.xml`
-   - Quick: `./diagnose-quick.xml`
-   - Full: `./diagnose-full.xml`
-3. 自动捕获 Claude Code 历史中的最近执行日志
-4. 根据选定模式并行执行目标 MCP 分析
-5. 处理并去重收集的数据
-6. 遵循模板结构生成 XML 诊断报告（会话内展示）
-7. 从 `<lesson>` 节点提取关键发现
-8. 记忆更新（如需）：
-   - 重要问题 → `~/basic-memory/<project>/diagnosis/<timestamp>-<issue-type>-<mode>.xml`
-   - 技术陷阱 → Serena (`pitfalls_<module>`)
-
----
-
-## Debug 策略选择
-
-**优先使用 mcp-debugger（运行时调试）**：
-- 数据源不明确（多个 API 返回相似字段）
-- 逻辑分支问题（不确定走了哪个分支）
-- 复杂计算错误（需要查看中间步骤）
-
-**使用 Debug Logging（快速诊断）**：
-- 简单问题（已知要查看的变量）
-- 无法使用断点的场景（异步/回调密集）
-
----
-
 ## Debug Logging 策略
 
 **触发条件**（主动添加 debug 日志）：
@@ -164,4 +167,3 @@ console.log('[DEBUG] Data sources:', {
 - 标注数据来源（区分相似变量）
 - 包含上下文（ID、名称、类型）
 - 显示公式（而非只有数值）
-

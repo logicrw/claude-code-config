@@ -18,18 +18,22 @@
 ```
 claude-code-config/
 ├── claude/
-│   ├── CLAUDE.md              # RPE 协作协议（核心 - 18KB）
-│   └── commands/              # 模式指令与诊断模板（已精简 47% Token）
-│       ├── begin.md           # 会话启动检查（71 行）
-│       ├── research.md        # RESEARCH 模式指令（43 行）
-│       ├── plan.md            # PLAN 模式指令（40 行）
-│       ├── execute.md         # EXECUTE 模式指令（67 行）
-│       ├── diagnose.md        # DIAGNOSE 模式指令（167 行）
+│   ├── CLAUDE.md              # RPE 协作协议（核心 - 16KB）
+│   └── commands/              # 模式指令与诊断模板（已精简 60%+ Token）
+│       ├── begin.md           # 会话启动检查
+│       ├── research.md        # RESEARCH 模式指令
+│       ├── plan.md            # PLAN 模式指令
+│       ├── execute.md         # EXECUTE 模式指令
+│       ├── diagnose.md        # DIAGNOSE 模式指令
+│       ├── wrap.md            # 会话结束收工清单
 │       ├── diagnose-focus.xml # Focus 诊断模板 (1-2K tokens)
 │       ├── diagnose-quick.xml # Quick 诊断模板 (3-5K tokens)
 │       └── diagnose-full.xml  # Full 诊断模板 (8-12K tokens)
 ├── codex/
-│   └── AGENTS.md              # Codex 单文件协议（481 行）
+│   ├── AGENTS.md              # Codex 单文件协议（292 行,精简 36%）
+│   ├── diagnose-focus.xml     # Focus 诊断模板
+│   ├── diagnose-quick.xml     # Quick 诊断模板
+│   └── diagnose-full.xml      # Full 诊断模板
 ├── mcp.json.template          # Claude Code MCP 配置模板
 ├── config.toml.template       # Serena/Codex MCP 配置模板
 └── README.md                  # 本文档
@@ -339,20 +343,26 @@ Claude 生成方案对比（Redis vs Memcached）
 
 ---
 
-## 🎯 优化成果（2025-10-12）
+## 🎯 优化成果（2025-10-18）
 
 ### Token 使用优化
 
-**命令文档精简**：
-- 原始行数：730 行 ≈ 7300 tokens
-- 精简后：388 行 ≈ 3880 tokens
-- **节省 47% Token 使用**
+**CLAUDE.md + commands/ 精简**：
+- 原始行数：730+ 行 ≈ 7300+ tokens
+- 精简后：923 行（含新增 wrap.md）
+- **精简策略**：删除冗余示例、合并重复内容、优化结构层次
 
-**精简策略**：
-- ❌ 移除冗余的"常见任务举例"（已在 begin.md 提供索引）
-- ❌ 移除详细的记忆策略说明（CLAUDE.md 已有完整说明）
-- ❌ 移除啰嗦的阶段完成提示模板
-- ✅ 保留核心的职责边界、工具策略、执行步骤
+**AGENTS.md 精简**：
+- 原始行数：460 行 ≈ 4600 tokens
+- 精简后：292 行 ≈ 2920 tokens
+- **节省 36% Token 使用**
+
+**精简原则**：
+- ❌ 删除重复的"核心规则"章节（底部与顶部重复）
+- ❌ 压缩各模式的详细步骤（从分步 bash 示例改为流程描述）
+- ❌ 移除冗余的模式切换决策表格
+- ✅ 保留核心流程、关键工具、实操示例（Git commit、Debug logging）
+- ✅ 新增 wrap.md 会话结束清单
 
 ### 一致性优化
 
@@ -442,8 +452,8 @@ Private - Personal Use Only
 
 | 配置类型 | 位置 | 文件大小 | 行数 | 特点 |
 |---------|------|---------|------|------|
-| **Claude Code** | `~/.claude/` | CLAUDE.md (18KB)<br>+ commands/*.md | 504 + 388 = 892 行 | 分离式结构，支持斜杠命令 |
-| **Codex** | `~/.codex/` | AGENTS.md (18KB) | 481 行 | 单文件协议，合并式结构 |
+| **Claude Code** | `~/.claude/` | CLAUDE.md (16KB)<br>+ commands/*.md | 923 行（含 wrap.md） | 分离式结构，支持斜杠命令 |
+| **Codex** | `~/.codex/` | AGENTS.md (12KB) | 292 行 | 单文件协议，精简 36% |
 
 ---
 
@@ -487,9 +497,10 @@ cp claude/commands/diagnose-*.xml ~/.claude/commands/
 
 ---
 
-**最后更新**: 2025-10-17
-- ✅ 恢复 MCP 配置模板文件（移除隐私信息）
-- ✅ 精简命令文档，减少 47% Token 使用
-- ✅ 统一路径引用与记忆体系
-- ✅ 优化 settings.json（4 个 Hook）
-- ✅ 补充故障排查指南
+**最后更新**: 2025-10-18
+- ✅ **大幅精简文档**：AGENTS.md 减少 36%，CLAUDE.md + commands/ 优化结构
+- ✅ 新增 wrap.md 会话结束清单
+- ✅ 移除 AGENTS.md 底部重复的"核心规则"章节
+- ✅ 压缩各模式详细步骤，改为流程描述 + 关键工具列表
+- ✅ 保留高价值实操示例（Git commit 格式、Debug logging 策略）
+- ✅ Codex 配置新增 XML 诊断模板支持
