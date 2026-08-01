@@ -69,6 +69,5 @@ exa get_code_context "API 用法"
 | **serena** | 代码分析 + 通用知识 | `find_symbol`, `read_memory "strategy_*"` |
 | **ripgrep** | 高性能全文搜索 | `ripgrep "pattern"` |
 | **exa** | 外部知识搜索 | `web_search`, `get_code_context` |
-| **ctx** | 上下文打包 | `ctx directory-list` |
 
 </details>

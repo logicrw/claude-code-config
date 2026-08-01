@@ -6,7 +6,6 @@
 <diagnosis mode="full" timestamp="YYYY-MM-DDTHH:MM:SSZ" tokens="10000" schema_version="1.1">
   <!-- 工具版本信息 -->
   <tool_versions>
-    <tool name="mcp-debugger" version="0.15.4" note="运行时断点调试、单步执行、变量检查（优先使用）"/>
     <tool name="ripgrep" version="13.0.0" note="高性能文本搜索，尊重 gitignore"/>
     <tool name="semgrep" version="1.45.0" note="安全漏洞扫描与代码质量检测（beta）"/>
     <tool name="serena" version="0.3.0" mode="mcp" note="基于 LSP 的符号级代码分析，多语言支持"/>
@@ -167,7 +166,7 @@
     </dependency_graph>
   </comprehensive_analysis>
 
-  <!-- mcp-debugger: 运行时断点调试、单步执行、变量检查（优先使用）-->
+  <!-- 运行时调试：优先使用语言原生调试器 -->
   <runtime_debugging>
     <session id="a4d1acc8-84a8" state="paused" reason="breakpoint" language="python">
       <breakpoints>
@@ -197,7 +196,7 @@
     </session>
   </runtime_debugging>
 
-  <!-- 备选：主动添加的 Debug 日志（当无法使用 mcp-debugger 时）-->
+  <!-- 备选：主动添加结构化 Debug 日志（当无法附加调试器时）-->
   <!-- Full 模式保留完整示例，原则：输出公式所有变量 + 标注数据源 + 结构化对象 -->
   <!--
   <debug_logs>

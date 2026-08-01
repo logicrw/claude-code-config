@@ -5,7 +5,6 @@
 <diagnosis mode="focus" timestamp="YYYY-MM-DDTHH:MM:SSZ" tokens="1500" schema_version="1.1">
   <!-- 工具版本信息 -->
   <tool_versions>
-    <tool name="mcp-debugger" version="0.15.4" note="运行时断点调试（可选，适用于复杂问题）"/>
     <tool name="ripgrep" version="13.0.0" note="高性能文本搜索，尊重 gitignore"/>
     <tool name="git" version="2.39.0"/>
   </tool_versions>
@@ -35,7 +34,7 @@
     </error_stack>
   </code_investigation>
 
-  <!-- mcp-debugger: 运行时断点调试（优先，可选）-->
+  <!-- 运行时调试：优先使用语言原生调试器 -->
   <!-- 如无法启用 debugger，可使用下方 debug_logs 替代 -->
   <runtime_debugging optional="true">
     <session id="a4d1acc8-84a8" state="paused" reason="breakpoint">
@@ -47,7 +46,7 @@
     </session>
   </runtime_debugging>
 
-  <!-- 备选：主动添加的 Debug 日志（当无法使用 mcp-debugger 时）-->
+  <!-- 备选：主动添加结构化 Debug 日志（当无法附加调试器时）-->
   <!-- 原则：输出公式所有变量 + 结构化对象 -->
   <!--
   <debug_logs>

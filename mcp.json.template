@@ -18,12 +18,6 @@
         "mcp-ripgrep"
       ]
     },
-    "ctx": {
-      "command": "ctx",
-      "args": [
-        "server"
-      ]
-    },
     "tree-sitter": {
       "command": "uvx",
       "args": [
@@ -45,25 +39,11 @@
       ]
     },
     "exa": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@smithery/cli@latest",
-        "run",
-        "exa",
-        "--key",
-        "YOUR_EXA_API_KEY_HERE"
-      ]
-    },
-    "mcp-debugger": {
-      "command": "node",
-      "args": [
-        "/path/to/mcp-debugger/dist/index.js",
-        "--log-level",
-        "info",
-        "--log-file",
-        "/path/to/mcp-debugger/debug-mcp-server.log"
-      ]
+      "type": "http",
+      "url": "https://mcp.exa.ai/mcp?tools=web_search_exa,web_fetch_exa,web_search_advanced_exa",
+      "headers": {
+        "x-api-key": "${EXA_API_KEY}"
+      }
     }
   }
 }

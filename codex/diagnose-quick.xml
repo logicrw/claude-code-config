@@ -5,7 +5,6 @@
 <diagnosis mode="quick" timestamp="YYYY-MM-DDTHH:MM:SSZ" tokens="4000" schema_version="1.1">
   <!-- 工具版本信息 -->
   <tool_versions>
-    <tool name="mcp-debugger" version="0.15.4" note="运行时断点调试（推荐用于数据源不明、逻辑分支问题）"/>
     <tool name="ripgrep" version="13.0.0" note="高性能文本搜索，尊重 gitignore"/>
     <tool name="semgrep" version="1.45.0" note="安全漏洞扫描与代码质量检测（beta）"/>
     <tool name="repomapper" version="0.2.1" note="PageRank 算法识别项目关键文件"/>
@@ -50,7 +49,7 @@
     <!-- Quick 模式跳过：serena 符号分析、tree-sitter AST 分析、exa 外部知识 -->
   </code_investigation>
 
-  <!-- mcp-debugger: 运行时断点调试（推荐，适用于数据源不明、逻辑分支问题）-->
+  <!-- 运行时调试：优先使用语言原生调试器 -->
   <runtime_debugging>
     <session id="a4d1acc8-84a8" state="paused" reason="breakpoint">
       <breakpoint id="28e06119-619e" file="src/user.service.ts" line="142" verified="true"/>
@@ -70,7 +69,7 @@
     </session>
   </runtime_debugging>
 
-  <!-- 备选：主动添加的 Debug 日志（当无法使用 mcp-debugger 时）-->
+  <!-- 备选：主动添加结构化 Debug 日志（当无法附加调试器时）-->
   <!-- 原则：输出公式所有变量 + 使用结构化对象 -->
   <!--
   <debug_logs>

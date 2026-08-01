@@ -20,12 +20,8 @@ description: 进入 DIAGNOSE 模式
 | **full** | 8K-12K | 复杂问题、深度分析 |
 
 ### 2. 运行时调试（优先）
-```bash
-# 适用于：数据源不明、逻辑分支、复杂计算
-mcp-debugger set_breakpoint <file> <line>
-mcp-debugger step_over
-mcp-debugger inspect_variable <name>
-```
+
+适用于数据源不明、逻辑分支和复杂计算。优先使用语言原生调试器；无法附加时使用结构化日志记录关键变量与分支。
 
 ### 3. 定位问题代码
 ```bash
@@ -86,7 +82,7 @@ serena write_memory "pitfalls_jwt_concurrent_refresh" """
 | 模式 | Token 范围 | 适用场景 | 核心工具 | 数据收集范围 |
 |------|-----------|---------|---------|------------|
 | **Focus** | 1K-2K | 明确错误、快速诊断 | ripgrep + git diff | 错误日志 + 错误代码 ±20 行 + 未提交变更 |
-| **Quick** | 3K-5K | 初步诊断、简单问题（默认） | + mcp-debugger + repomapper + semgrep | + 项目结构 + 错误模式搜索 + 安全扫描 + 最近 5 次提交 |
+| **Quick** | 3K-5K | 初步诊断、简单问题（默认） | + repomapper + semgrep | + 项目结构 + 错误模式搜索 + 安全扫描 + 最近 5 次提交 |
 | **Full** | 8K-12K | 复杂问题、深度分析、性能问题 | + serena + tree-sitter + exa | + 符号分析 + AST 分析 + 外部知识 + 历史分析 + 依赖分析 |
 
 ---
@@ -94,9 +90,8 @@ serena write_memory "pitfalls_jwt_concurrent_refresh" """
 ## 工具策略（并行调用）
 
 ### 运行时调试（优先）
-```bash
-mcp-debugger → 断点调试、单步执行、变量检查（适用于复杂问题、数据源不明）
-```
+
+使用语言原生调试器完成断点、单步和变量检查；无法附加时改用结构化日志。
 
 ### 核心诊断工具
 ```bash

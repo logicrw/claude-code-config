@@ -106,14 +106,12 @@ cp claude/commands/diagnose-*.xml ~/.codex/
 
 2. **修改配置文件中的占位符**：
    - `YOUR_EXA_API_KEY_HERE` → 替换为实际的 Exa API Key
-   - `/path/to/mcp-debugger/...` → 替换为实际的 mcp-debugger 安装路径
    - 其他本地路径根据实际情况调整
 
-3. **配置的 MCP 工具**（8 个）：
-   - `mcp-debugger`（运行时调试，高优先级）
+3. **配置的 MCP 工具**（6 个）：
    - `serena`（LSP 符号分析）
    - `ripgrep`（文本搜索）
-   - `tree-sitter`、`semgrep`、`repomapper`、`exa`、`ctx`
+   - `tree-sitter`、`semgrep`、`repomapper`、`exa`
 
 4. **验证 MCP 工具**：
    ```bash
@@ -150,7 +148,7 @@ cp claude/commands/diagnose-*.xml ~/.codex/
 | **RESEARCH** | 理解需求、识别风险 | serena + ripgrep + repomapper | Basic Memory (designs/) |
 | **PLAN** | 设计方案、拆分任务 | serena + tree-sitter + semgrep | Basic Memory (designs/决策/) |
 | **EXECUTE** | 实现代码、运行测试 | serena + ripgrep + semgrep | 最小 diff + 测试通过的 commit |
-| **DIAGNOSE** | 问题诊断、根因分析 | mcp-debugger + serena + ripgrep | XML 报告 + Basic Memory (diagnosis/) |
+| **DIAGNOSE** | 问题诊断、根因分析 | serena + ripgrep + semgrep | XML 报告 + Basic Memory (diagnosis/) |
 
 **模式切换规则**：
 - 默认模式：`RESEARCH`
@@ -173,12 +171,7 @@ cp claude/commands/diagnose-*.xml ~/.codex/
 
 ---
 
-## 🛠️ MCP 工具栈（8 个）
-
-### 调试层（Debug Layer）
-| 工具 | 用途 | 优先级 |
-|------|------|--------|
-| `mcp-debugger` | 运行时断点调试、单步执行、变量检查 | 🔴 高 |
+## 🛠️ MCP 工具栈（6 个）
 
 ### 记忆层（Memory Layer）
 | 工具 | 用途 | 优先级 |
@@ -197,13 +190,12 @@ cp claude/commands/diagnose-*.xml ~/.codex/
 | 工具 | 用途 | 优先级 |
 |------|------|--------|
 | `exa` | 双模式搜索（web + 10 亿+ GitHub/Stack Overflow）| 🟡 中 |
-| `ctx` | 项目上下文打包工具 | 🟢 低 |
 
 **工具选择策略**：
 - **RESEARCH**：serena（语义理解）+ ripgrep（全文搜索）+ repomapper（关键文件）
 - **PLAN**：serena（影响范围）+ tree-sitter（复杂度）+ semgrep（风险）
 - **EXECUTE**：serena（LSP 编辑）+ ripgrep（调用点）+ semgrep（安全）
-- **DIAGNOSE**：mcp-debugger（优先）+ 其他所有工具（按 focus/quick/full 选择）
+- **DIAGNOSE**：ripgrep + serena + 语言原生调试器或结构化日志
 
 ---
 
@@ -303,7 +295,7 @@ Claude 会自动：
 
 [MODE: DIAGNOSE]
 
-选择 Quick 模式，使用 mcp-debugger 单步执行...
+选择 Quick 模式，使用最小复现和结构化日志定位...
 
 发现问题：discount 未做非负校验
 

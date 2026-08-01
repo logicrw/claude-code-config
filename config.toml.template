@@ -8,10 +8,6 @@ args = [ "--from", "git+https://github.com/oraios/serena", "serena", "start-mcp-
 command = "npx"
 args = [ "-y", "mcp-ripgrep" ]
 
-[mcp_servers.ctx]
-command = "ctx"
-args = [ "server" ]
-
 [mcp_servers.tree-sitter]
 command = "uvx"
 args = [ "mcp-server-tree-sitter" ]
@@ -25,13 +21,7 @@ command = "uvx"
 args = [ "--from", "git+https://github.com/pdavis68/RepoMapper.git", "repomap-mcp" ]
 
 [mcp_servers.exa]
-command = "npx"
-args = [ "-y", "@smithery/cli@latest", "run", "exa", "--key", "YOUR_EXA_API_KEY_HERE" ]
+url = "https://mcp.exa.ai/mcp?tools=web_search_exa,web_fetch_exa,web_search_advanced_exa"
 
-[mcp_servers.mcp-debugger]
-command = "node"
-args = [
-  "/path/to/mcp-debugger/dist/index.js",
-  "--log-level", "info",
-  "--log-file", "/path/to/mcp-debugger/debug-mcp-server.log"
-]
+[mcp_servers.exa.env_http_headers]
+x-api-key = "EXA_API_KEY"
